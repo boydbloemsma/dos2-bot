@@ -1,23 +1,41 @@
 const rp = require('request-promise');
 const $ = require('cheerio');
 
-module.exports = async (msg, args) => {
+module.exports = (msg, args) => {
   const addOn = args.join('+');
   const url = `https://divinityoriginalsin2.wiki.fextralife.com/${addOn}`;
 
   rp(url).then((html) => {
     const questHeaders = [];
     const objectives = [];
-    const textFields = [];
+    let textFields = [];
     $('div#wiki-content-block > h3', html).map((i, elm) => questHeaders.push($(elm).text()));
     $('div#wiki-content-block > ol > li', html).map((i, elm) => objectives.push($(elm).text()));
     $('div#wiki-content-block > p', html).map((i, elm) => textFields.push($(elm).text()));
+    textFields = textFields.filter((el) => /\S/.test(el)).slice(1).join('\n\n');
 
-    for (let i = 8; i < (textFields.length - 2); i++) {
-      console.log(textFields[i]);
-    }
-    // console.log(objectives);
+    const embed = {
+      color: 0xA63D40,
+      title: 'Quest helper!',
+      url: `${url}`,
+      fields: [
+        {
+          name: `${questHeaders[0]}`,
+          value: 'testing',
+          inline: true,
+        },
+        {
+          name: `${questHeaders[1]}`,
+          value: `${objectives.join('\n')}`,
+          inline: true,
+        },
+        {
+          name: `${questHeaders[2]}`,
+          value: `${textFields}`,
+        },
+      ],
+    };
+
+    msg.channel.send({ embed });
   });
-
-  // await msg.channel.send(`https://divinityoriginalsin2.wiki.fextralife.com/${addOn}`);
 };
