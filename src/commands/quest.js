@@ -16,7 +16,6 @@ module.exports = (msg, args) => {
     $('div#wiki-content-block > p', html).map((i, elm) => textFields.push($(elm).text()));
     textFields = textFields.filter((el) => /\S/.test(el)).slice(1).join('\n\n');
 
-    console.log(importantNPCs);
     const embed = {
       color: 0xA63D40,
       title: 'Quest helper!',
